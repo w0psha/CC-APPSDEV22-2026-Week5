@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\USER\\OneDrive\\Documents\\AppsDev\\Midterm\\Week 4\\StudentRosterApi\\StudentRosterApi.csproj": {}
+    "C:\\Users\\USER\\OneDrive\\Documents\\AppsDev\\Midterm\\Week 5\\StudentRosterDbApi\\StudentRosterApi.csproj": {}
   },
   "projects": {
-    "C:\\Users\\USER\\OneDrive\\Documents\\AppsDev\\Midterm\\Week 4\\StudentRosterApi\\StudentRosterApi.csproj": {
+    "C:\\Users\\USER\\OneDrive\\Documents\\AppsDev\\Midterm\\Week 5\\StudentRosterDbApi\\StudentRosterApi.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\USER\\OneDrive\\Documents\\AppsDev\\Midterm\\Week 4\\StudentRosterApi\\StudentRosterApi.csproj",
+        "projectUniqueName": "C:\\Users\\USER\\OneDrive\\Documents\\AppsDev\\Midterm\\Week 5\\StudentRosterDbApi\\StudentRosterApi.csproj",
         "projectName": "StudentRosterApi",
-        "projectPath": "C:\\Users\\USER\\OneDrive\\Documents\\AppsDev\\Midterm\\Week 4\\StudentRosterApi\\StudentRosterApi.csproj",
+        "projectPath": "C:\\Users\\USER\\OneDrive\\Documents\\AppsDev\\Midterm\\Week 5\\StudentRosterDbApi\\StudentRosterApi.csproj",
         "packagesPath": "C:\\Users\\USER\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\USER\\OneDrive\\Documents\\AppsDev\\Midterm\\Week 4\\StudentRosterApi\\obj\\",
+        "outputPath": "C:\\Users\\USER\\OneDrive\\Documents\\AppsDev\\Midterm\\Week 5\\StudentRosterDbApi\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -54,6 +54,20 @@
             "Microsoft.AspNetCore.OpenApi": {
               "target": "Package",
               "version": "[9.0.2, )"
+            },
+            "Microsoft.EntityFrameworkCore": {
+              "target": "Package",
+              "version": "[9.0.0, )"
+            },
+            "Microsoft.EntityFrameworkCore.Design": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[9.0.0, )"
+            },
+            "Microsoft.EntityFrameworkCore.Sqlite": {
+              "target": "Package",
+              "version": "[9.0.0, )"
             },
             "Swashbuckle.AspNetCore": {
               "target": "Package",

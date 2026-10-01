@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace StudentRosterApi.Models
+namespace StudentRosterDbApi.Models
 {
     public class Student
     {

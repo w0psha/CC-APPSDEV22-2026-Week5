@@ -1,31 +1,34 @@
 using Microsoft.AspNetCore.Mvc;
-using StudentRosterApi.Models;
+using Microsoft.EntityFrameworkCore;
+using StudentRosterDbApi.Data;
+using StudentRosterDbApi.Models;
 
-namespace StudentRosterApi.Controllers
+namespace StudentRosterDbApi.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
     public class StudentsController : ControllerBase
     {
-        // Simulated in-memory database
-        private static List<Student> students = new List<Student>
+        private readonly AppDbContext _context;
+
+        public StudentsController(AppDbContext context)
         {
-            new Student { Id = 1, FirstName = "Juan", LastName = "Dela Cruz", Email = "juan.delacruz@cit.edu", Course = "BSCS", YearLevel = 3 },
-            new Student { Id = 2, FirstName = "Maria", LastName = "Clara", Email = "maria.clara@cit.edu", Course = "BSIT", YearLevel = 2 }
-        };
+            _context = context;
+        }
 
         // GET: api/students
         [HttpGet]
-        public IActionResult GetAllStudents()
+        public async Task<IActionResult> GetAllStudents()
         {
+            var students = await _context.Students.ToListAsync();
             return Ok(students);
         }
 
         // GET: api/students/5
         [HttpGet("{id}")]
-        public IActionResult GetStudentById(int id)
+        public async Task<IActionResult> GetStudentById(int id)
         {
-            var student = students.FirstOrDefault(s => s.Id == id);
+            var student = await _context.Students.FindAsync(id);
             if (student == null)
             {
                 return NotFound(new { message = $"Student with ID {id} not found." });
@@ -33,41 +36,42 @@ namespace StudentRosterApi.Controllers
             return Ok(student);
         }
 
-        // GET: api/students/course/BSCS (Attempt 2 Filter Endpoint)
+        // GET: api/students/course/{courseName}
         [HttpGet("course/{courseName}")]
-        public IActionResult GetStudentsByCourse(string courseName)
+        public async Task<IActionResult> GetStudentsByCourse(string courseName)
         {
-            var filtered = students
+            var students = await _context.Students
                 .Where(s => s.Course.Equals(courseName, StringComparison.OrdinalIgnoreCase))
-                .ToList();
-            return Ok(filtered);
+                .ToListAsync();
+
+            return Ok(students);
         }
 
         // POST: api/students
         [HttpPost]
-        public IActionResult CreateStudent([FromBody] Student newStudent)
+        public async Task<IActionResult> CreateStudent([FromBody] Student newStudent)
         {
             if (string.IsNullOrWhiteSpace(newStudent.FirstName) || string.IsNullOrWhiteSpace(newStudent.LastName))
             {
                 return BadRequest(new { message = "First name and last name are required." });
             }
 
-            newStudent.Id = students.Any() ? students.Max(s => s.Id) + 1 : 1;
-            students.Add(newStudent);
+            _context.Students.Add(newStudent);
+            await _context.SaveChangesAsync();
 
             return CreatedAtAction(nameof(GetStudentById), new { id = newStudent.Id }, newStudent);
         }
 
         // PUT: api/students/5
         [HttpPut("{id}")]
-        public IActionResult UpdateStudent(int id, [FromBody] Student updatedStudent)
+        public async Task<IActionResult> UpdateStudent(int id, [FromBody] Student updatedStudent)
         {
             if (id != updatedStudent.Id)
             {
                 return BadRequest(new { message = "ID mismatch." });
             }
 
-            var existingStudent = students.FirstOrDefault(s => s.Id == id);
+            var existingStudent = await _context.Students.FindAsync(id);
             if (existingStudent == null)
             {
                 return NotFound();
@@ -75,24 +79,26 @@ namespace StudentRosterApi.Controllers
 
             existingStudent.FirstName = updatedStudent.FirstName;
             existingStudent.LastName = updatedStudent.LastName;
-            existingStudent.Email = updatedStudent.Email;
             existingStudent.Course = updatedStudent.Course;
             existingStudent.YearLevel = updatedStudent.YearLevel;
+            existingStudent.Email = updatedStudent.Email;
 
+            await _context.SaveChangesAsync();
             return NoContent();
         }
 
         // DELETE: api/students/5
         [HttpDelete("{id}")]
-        public IActionResult DeleteStudent(int id)
+        public async Task<IActionResult> DeleteStudent(int id)
         {
-            var student = students.FirstOrDefault(s => s.Id == id);
+            var student = await _context.Students.FindAsync(id);
             if (student == null)
             {
                 return NotFound();
             }
 
-            students.Remove(student);
+            _context.Students.Remove(student);
+            await _context.SaveChangesAsync();
             return NoContent();
         }
     }
