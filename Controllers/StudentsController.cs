@@ -16,78 +16,79 @@ namespace StudentRosterDbApi.Controllers
             _context = context;
         }
 
-        // GET: api/students
+        // GET: api/Students
         [HttpGet]
-        public async Task<IActionResult> GetAllStudents()
+        public async Task<ActionResult<IEnumerable<Student>>> GetAllStudents()
         {
-            var students = await _context.Students.ToListAsync();
-            return Ok(students);
+            return await _context.Students.ToListAsync();
         }
 
-        // GET: api/students/5
+        // GET: api/Students/5
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetStudentById(int id)
+        public async Task<ActionResult<Student>> GetStudentById(int id)
         {
             var student = await _context.Students.FindAsync(id);
+
             if (student == null)
             {
-                return NotFound(new { message = $"Student with ID {id} not found." });
+                return NotFound();
             }
-            return Ok(student);
+
+            return student;
         }
 
-        // GET: api/students/course/{courseName}
+        // GET: api/Students/course/BSIT
         [HttpGet("course/{courseName}")]
-        public async Task<IActionResult> GetStudentsByCourse(string courseName)
+        public async Task<ActionResult<IEnumerable<Student>>> GetStudentsByCourse(string courseName)
         {
             var students = await _context.Students
-                .Where(s => s.Course.Equals(courseName, StringComparison.OrdinalIgnoreCase))
+                .Where(s => s.Course.ToLower() == courseName.ToLower())
                 .ToListAsync();
 
             return Ok(students);
         }
 
-        // POST: api/students
+        // POST: api/Students
         [HttpPost]
-        public async Task<IActionResult> CreateStudent([FromBody] Student newStudent)
+        public async Task<ActionResult<Student>> CreateStudent(Student student)
         {
-            if (string.IsNullOrWhiteSpace(newStudent.FirstName) || string.IsNullOrWhiteSpace(newStudent.LastName))
-            {
-                return BadRequest(new { message = "First name and last name are required." });
-            }
-
-            _context.Students.Add(newStudent);
+            _context.Students.Add(student);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetStudentById), new { id = newStudent.Id }, newStudent);
+            return CreatedAtAction(nameof(GetStudentById), new { id = student.Id }, student);
         }
 
-        // PUT: api/students/5
+        // PUT: api/Students/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateStudent(int id, [FromBody] Student updatedStudent)
+        public async Task<IActionResult> UpdateStudent(int id, Student student)
         {
-            if (id != updatedStudent.Id)
+            if (id != student.Id)
             {
-                return BadRequest(new { message = "ID mismatch." });
+                return BadRequest();
             }
 
-            var existingStudent = await _context.Students.FindAsync(id);
-            if (existingStudent == null)
+            _context.Entry(student).State = EntityState.Modified;
+
+            try
             {
-                return NotFound();
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!StudentExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
             }
 
-            existingStudent.FirstName = updatedStudent.FirstName;
-            existingStudent.LastName = updatedStudent.LastName;
-            existingStudent.Course = updatedStudent.Course;
-            existingStudent.YearLevel = updatedStudent.YearLevel;
-            existingStudent.Email = updatedStudent.Email;
-
-            await _context.SaveChangesAsync();
             return NoContent();
         }
 
-        // DELETE: api/students/5
+        // DELETE: api/Students/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteStudent(int id)
         {
@@ -99,7 +100,13 @@ namespace StudentRosterDbApi.Controllers
 
             _context.Students.Remove(student);
             await _context.SaveChangesAsync();
+
             return NoContent();
+        }
+
+        private bool StudentExists(int id)
+        {
+            return _context.Students.Any(e => e.Id == id);
         }
     }
 }

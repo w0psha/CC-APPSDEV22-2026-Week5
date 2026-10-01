@@ -17,4 +17,10 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Watch Remove="*.db;*.db-shm;*.db-wal" />
+  </ItemGroup>
+<ItemGroup>
+    <Watch Remove="*.db;*.db-shm;*.db-wal;bin\**;obj\**" />
+  </ItemGroup>
 </Project>
